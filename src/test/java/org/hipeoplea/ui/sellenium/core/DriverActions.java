@@ -111,10 +111,13 @@ final class DriverActions {
     }
 
     private ExpectedCondition<Boolean> pageIsFullyLoaded() {
-        return currentDriver -> Objects.equals(
-                "complete",
-                ((JavascriptExecutor) currentDriver).executeScript("return document.readyState")
-        );
+        return currentDriver -> {
+            assert currentDriver != null;
+            return Objects.equals(
+                    "complete",
+                    ((JavascriptExecutor) currentDriver).executeScript("return document.readyState")
+            );
+        };
     }
 
     private WebElement findFirstDisplayed(WebDriver currentDriver, By... locators) {

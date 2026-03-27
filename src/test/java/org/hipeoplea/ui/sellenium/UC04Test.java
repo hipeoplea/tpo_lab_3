@@ -20,7 +20,7 @@ public class UC04Test extends BaseUiTest {
         boolean waypointControlVisible = twoGis.isWaypointControlVisible(Duration.ofSeconds(5));
         Assumptions.assumeTrue(
                 waypointControlVisible,
-                "Кнопка добавления промежуточной точки требует ручного уточнения XPath под текущую версию 2GIS."
+                "Проблемы с x-path"
         );
 
         twoGis.addWaypoint("Pitas");

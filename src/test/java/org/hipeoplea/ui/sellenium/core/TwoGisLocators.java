@@ -50,7 +50,6 @@ final class TwoGisLocators {
             By.xpath("(//input[@type='text' and not(@disabled)])[2]")
     };
 
-    // TODO: Если 2GIS изменит кнопку добавления точки, XPath ниже нужно уточнить вручную.
     static final By[] ADD_WAYPOINT_BUTTON_LOCATORS = {
             By.xpath("//*[@id='root']/div/div/div[1]/div[1]/div[3]/div/div/div/div/div/div[1]/div/div[2]/div/div[4]"),
             By.xpath("//button[contains(.,'Добавить точку') or contains(.,'Промежуточ')]"),
