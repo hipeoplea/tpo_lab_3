@@ -94,17 +94,34 @@ public class TwoGisSteps {
     }
 
     public void addWaypoint(String waypoint) {
-        actions.safeClick(actions.waitForAnyClickable(DEFAULT_TIMEOUT, TwoGisLocators.ADD_WAYPOINT_BUTTON_LOCATORS));
-        fillRoutePoint(TwoGisLocators.WAYPOINT_INPUT_LOCATORS, waypoint);
-        submitRouteBuild();
+        addWaypoint(1, waypoint);
     }
 
     public String readWaypointValue() {
-        return actions.readInputValue(TwoGisLocators.WAYPOINT_INPUT_LOCATORS);
+        return readWaypointValue(1);
     }
 
     public String waitForRouteSummaryChange(String previousSummary) {
         return actions.waitForTextChange(DEFAULT_TIMEOUT, previousSummary, TwoGisLocators.ROUTE_SUMMARY_LOCATORS);
+    }
+
+    public void selectWalkingRouteType() {
+        actions.safeClick(actions.waitForAnyClickable(DEFAULT_TIMEOUT, TwoGisLocators.WALK_ROUTE_BUTTON_LOCATORS));
+    }
+
+    public void buildRouteWithoutFrom(String to) {
+        fillRoutePoint(TwoGisLocators.TO_INPUT_LOCATORS, to);
+        submitRouteBuild();
+    }
+
+    public void addWaypoint(int waypointNumber, String waypoint) {
+        actions.safeClick(actions.waitForAnyClickable(DEFAULT_TIMEOUT, TwoGisLocators.ADD_WAYPOINT_BUTTON_LOCATORS));
+        fillRoutePoint(TwoGisLocators.waypointInputLocators(waypointNumber), waypoint);
+        submitRouteBuild();
+    }
+
+    public String readWaypointValue(int waypointNumber) {
+        return actions.readInputValue(TwoGisLocators.waypointInputLocators(waypointNumber));
     }
 
     public void clickMyLocation() {

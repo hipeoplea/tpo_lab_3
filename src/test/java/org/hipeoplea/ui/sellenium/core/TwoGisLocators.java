@@ -74,6 +74,12 @@ final class TwoGisLocators {
             By.xpath("//div[@role='button'][contains(.,'Построить')]")
     };
 
+    static final By[] WALK_ROUTE_BUTTON_LOCATORS = {
+            By.xpath("//*[@id='root']/div/div/div[1]/div[1]/div[3]/div/div/div/div/div/div[1]/div/div[1]/div/div/div[1]/button[2]"),
+            By.xpath("//button[contains(.,'Пешком')]"),
+            By.xpath("//button[contains(@aria-label,'Пешком')]")
+    };
+
     static final By[] ROUTE_SUMMARY_LOCATORS = {
             By.xpath("(//*[self::div or self::span][contains(normalize-space(.),'мин')])[1]"),
             By.xpath("(//*[self::div or self::span][contains(normalize-space(.),'мин') and contains(normalize-space(.),'км')])[1]"),
@@ -109,5 +115,14 @@ final class TwoGisLocators {
     };
 
     private TwoGisLocators() {
+    }
+
+    static By[] waypointInputLocators(int waypointNumber) {
+        if (waypointNumber <= 1) {
+            return WAYPOINT_INPUT_LOCATORS;
+        }
+
+        int inputIndex = waypointNumber + 2;
+        return new By[]{By.xpath("(//input[@type='text' and not(@disabled)])[" + inputIndex + "]")};
     }
 }
