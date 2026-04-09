@@ -38,9 +38,8 @@ public class TwoGisSteps {
     }
 
     public void search(String query) {
-        WebElement searchInput = actions.waitForAnyClickable(DEFAULT_TIMEOUT, TwoGisLocators.SEARCH_INPUT_LOCATORS);
-        actions.clearAndType(searchInput, query);
-        searchInput.sendKeys(Keys.ENTER);
+        actions.clearAndType(DEFAULT_TIMEOUT, query, TwoGisLocators.SEARCH_INPUT_LOCATORS);
+        actions.waitForAnyVisible(DEFAULT_TIMEOUT, TwoGisLocators.SEARCH_INPUT_LOCATORS).sendKeys(Keys.ENTER);
         actions.waitUntil(
                 currentDriver -> currentDriver.getCurrentUrl().contains("/search/")
                         || actions.isAnyElementVisible(TwoGisLocators.SEARCH_RESULT_LOCATORS),
@@ -53,14 +52,57 @@ public class TwoGisSteps {
         return actions.isAnyElementVisible(TwoGisLocators.SEARCH_RESULT_LOCATORS);
     }
 
+    public String readNoResultsMessage() {
+        return actions.waitForNonBlankText(DEFAULT_TIMEOUT, TwoGisLocators.NO_RESULTS_MESSAGE_LOCATORS);
+    }
+
     public void openFirstResult() {
         actions.safeClick(actions.waitForAnyClickable(DEFAULT_TIMEOUT, TwoGisLocators.SEARCH_RESULT_LOCATORS));
-        actions.waitUntil(
-                currentDriver -> currentDriver.getCurrentUrl().contains("/firm/")
-                        || currentDriver.getCurrentUrl().contains("/geo/")
-                        || actions.isAnyElementVisible(TwoGisLocators.OBJECT_CARD_TITLE_LOCATORS),
-                DEFAULT_TIMEOUT
-        );
+        waitForObjectCard();
+    }
+
+    public void openObjectFromMapMarker() {
+        actions.safeClick(actions.waitForAnyClickable(DEFAULT_TIMEOUT, TwoGisLocators.MAP_MARKER_LOCATORS));
+        waitForObjectCard();
+    }
+
+    public void openGuide() {
+        try {
+            actions.safeClick(actions.waitForAnyVisible(DEFAULT_TIMEOUT, TwoGisLocators.GUIDE_BUTTON_LOCATORS));
+            boolean opened = actions.waitUntil(
+                    currentDriver -> currentDriver.getCurrentUrl().contains("/guide")
+                            || actions.isAnyElementVisible(TwoGisLocators.GUIDE_DISTRICT_LOCATORS),
+                    DEFAULT_TIMEOUT
+            );
+            if (!opened) {
+                openUrl(TwoGisLocators.GUIDE_URL);
+            }
+        } catch (TimeoutException exception) {
+            openUrl(TwoGisLocators.GUIDE_URL);
+        }
+        dismissCommonOverlays();
+    }
+
+    public void selectGuideDistrict() {
+        try {
+            actions.safeClick(actions.waitForAnyVisible(Duration.ofSeconds(40), TwoGisLocators.GUIDE_DISTRICT_LOCATORS));
+            actions.waitUntil(
+                    currentDriver -> actions.isAnyElementVisible(TwoGisLocators.SEARCH_RESULT_LOCATORS)
+                            || actions.isAnyElementVisible(TwoGisLocators.OBJECT_CARD_TITLE_LOCATORS),
+                    DEFAULT_TIMEOUT
+            );
+        } catch (TimeoutException exception) {
+            actions.safeClick(actions.waitForAnyVisible(DEFAULT_TIMEOUT, TwoGisLocators.GUIDE_COLLECTION_LOCATORS));
+            actions.waitUntil(
+                    currentDriver -> currentDriver.getCurrentUrl().contains("/collection/")
+                            || actions.isAnyElementVisible(TwoGisLocators.SEARCH_RESULT_LOCATORS),
+                    DEFAULT_TIMEOUT
+            );
+        }
+    }
+
+    public void openFirstGuidePlace() {
+        openFirstResult();
     }
 
     public String readObjectCardTitle() {
@@ -120,6 +162,15 @@ public class TwoGisSteps {
         submitRouteBuild();
     }
 
+    public boolean tryAddWaypoint(int waypointNumber, String waypoint) {
+        try {
+            addWaypoint(waypointNumber, waypoint);
+            return true;
+        } catch (TimeoutException exception) {
+            return false;
+        }
+    }
+
     public String readWaypointValue(int waypointNumber) {
         return actions.readInputValue(TwoGisLocators.waypointInputLocators(waypointNumber));
     }
@@ -147,18 +198,44 @@ public class TwoGisSteps {
         return actions.waitForAnyVisible(DEFAULT_TIMEOUT, TwoGisLocators.SHARE_PANEL_LOCATORS).isDisplayed();
     }
 
+    public void openWeather() {
+        actions.safeClick(actions.waitForAnyClickable(DEFAULT_TIMEOUT, TwoGisLocators.WEATHER_BUTTON_LOCATORS));
+    }
+
+    public boolean isWeatherPanelVisible() {
+        return actions.waitForAnyVisible(DEFAULT_TIMEOUT, TwoGisLocators.WEATHER_PANEL_LOCATORS).isDisplayed();
+    }
+
+    public void clickZoomIn() {
+        actions.safeClick(actions.waitForAnyVisible(DEFAULT_TIMEOUT, TwoGisLocators.ZOOM_IN_BUTTON_LOCATORS));
+    }
+
+    public void clickZoomOut() {
+        actions.safeClick(actions.waitForAnyVisible(DEFAULT_TIMEOUT, TwoGisLocators.ZOOM_OUT_BUTTON_LOCATORS));
+    }
+
+    public String readCurrentUrl() {
+        return actions.currentUrl();
+    }
+
+    public boolean waitForUrlChange(String previousUrl, Duration timeout) {
+        return actions.waitUntil(
+                currentDriver -> !currentDriver.getCurrentUrl().equals(previousUrl),
+                timeout
+        );
+    }
+
     private void openUrl(String url) {
         actions.openUrl(url);
         dismissCommonOverlays();
     }
 
     private void fillRoutePoint(org.openqa.selenium.By[] locators, String value) {
-        WebElement input = actions.waitForAnyClickable(DEFAULT_TIMEOUT, locators);
-        actions.clearAndType(input, value);
+        actions.clearAndType(DEFAULT_TIMEOUT, value, locators);
         try {
             actions.safeClick(actions.waitForAnyClickable(SHORT_TIMEOUT, TwoGisLocators.AUTOCOMPLETE_OPTION_LOCATORS));
         } catch (TimeoutException | StaleElementReferenceException ignored) {
-            WebElement refreshedInput = actions.waitForAnyClickable(DEFAULT_TIMEOUT, locators);
+            WebElement refreshedInput = actions.waitForAnyVisible(DEFAULT_TIMEOUT, locators);
             refreshedInput.sendKeys(Keys.ARROW_DOWN);
             refreshedInput.sendKeys(Keys.ENTER);
         }
@@ -178,5 +255,14 @@ public class TwoGisSteps {
         } catch (TimeoutException ignored) {
             // Всплывающего окна может не быть.
         }
+    }
+
+    private void waitForObjectCard() {
+        actions.waitUntil(
+                currentDriver -> currentDriver.getCurrentUrl().contains("/firm/")
+                        || currentDriver.getCurrentUrl().contains("/geo/")
+                        || actions.isAnyElementVisible(TwoGisLocators.OBJECT_CARD_TITLE_LOCATORS),
+                DEFAULT_TIMEOUT
+        );
     }
 }

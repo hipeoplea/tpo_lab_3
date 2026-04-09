@@ -7,6 +7,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -28,8 +29,22 @@ final class DriverActions {
     }
 
     void openUrl(String url) {
-        driver.get(url);
-        wait.until(pageIsFullyLoaded());
+        WebDriverException lastException = null;
+        for (int attempt = 0; attempt < 2; attempt++) {
+            try {
+                driver.get(url);
+                wait.until(pageIsFullyLoaded());
+                return;
+            } catch (WebDriverException exception) {
+                lastException = exception;
+            }
+        }
+
+        throw lastException;
+    }
+
+    String currentUrl() {
+        return driver.getCurrentUrl();
     }
 
     boolean waitUntil(Function<WebDriver, Boolean> condition, Duration timeout) {
@@ -99,6 +114,22 @@ final class DriverActions {
         element.sendKeys(Keys.DELETE);
         element.clear();
         element.sendKeys(value);
+    }
+
+    void clearAndType(Duration timeout, String value, By... locators) {
+        StaleElementReferenceException lastException = null;
+        for (int attempt = 0; attempt < 3; attempt++) {
+            try {
+                WebElement element = waitForAnyVisible(timeout, locators);
+                clearAndType(element, value);
+                return;
+            } catch (StaleElementReferenceException exception) {
+                lastException = exception;
+            }
+        }
+        if (lastException != null) {
+            throw lastException;
+        }
     }
 
     void safeClick(WebElement element) {

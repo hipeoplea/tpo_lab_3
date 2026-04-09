@@ -6,6 +6,7 @@ final class TwoGisLocators {
 
     static final String HOME_URL = "https://2gis.ru/spb";
     static final String DIRECTIONS_URL = "https://2gis.ru/spb/directions";
+    static final String GUIDE_URL = "https://2gis.ru/spb/guide";
 
     static final By[] SEARCH_INPUT_LOCATORS = {
             By.xpath("//input[contains(@placeholder,'Поиск') or contains(@aria-label,'Поиск') or contains(@placeholder,'Что') or contains(@aria-label,'Что')]"),
@@ -18,6 +19,17 @@ final class TwoGisLocators {
             By.xpath("//a[contains(@href,'/geo/') and normalize-space(.)!='']"),
             By.xpath("//article[normalize-space(.)!='']"),
             By.xpath("(//div[contains(@class,'search') or contains(@class,'result')]//*[self::a or self::article][normalize-space(.)!=''])[1]")
+    };
+
+    static final By[] NO_RESULTS_MESSAGE_LOCATORS = {
+            By.xpath("//*[@id='root']/div/div/div[1]/div[1]/div[3]/div/div/div[2]/div/div/div/div[2]/div[2]/div[1]/div/div/div/div[2]/div/h1"),
+            By.xpath("//*[contains(normalize-space(.),'Ничего не нашлось')]")
+    };
+
+    static final By[] MAP_MARKER_LOCATORS = {
+            By.xpath("//*[@id='map']/div/div[1]/div/div[5]/div/div"),
+            By.xpath("//*[@id='map']//*[contains(@class,'marker') or contains(@class,'pin') or @role='button']"),
+            By.xpath("(//*[@id='map']//*[name()='svg']/ancestor::*[self::div or self::button][1])[1]")
     };
 
     static final By[] OBJECT_CARD_TITLE_LOCATORS = {
@@ -36,6 +48,24 @@ final class TwoGisLocators {
             By.xpath("//a[normalize-space()='Маршруты']"),
             By.xpath("//button[normalize-space()='Маршруты']"),
             By.xpath("//div[@role='button'][normalize-space()='Маршруты']")
+    };
+
+    static final By[] GUIDE_BUTTON_LOCATORS = {
+            By.xpath("//*[@id='root']/div/div/div[1]/div[1]/div[1]/div[4]"),
+            By.xpath("//a[normalize-space()='Гид']"),
+            By.xpath("//button[normalize-space()='Гид']"),
+            By.xpath("//div[@role='button'][normalize-space()='Гид']")
+    };
+
+    static final By[] GUIDE_DISTRICT_LOCATORS = {
+            By.xpath("//*[@id='map']/div/div[1]/div/div[8]/div/div/div"),
+            By.xpath("//*[@id='map']//*[contains(@class,'district') or contains(@class,'area')]"),
+            By.xpath("(//*[@id='map']//*[name()='path' or name()='polygon']/ancestor::*[self::div or self::g][1])[1]")
+    };
+
+    static final By[] GUIDE_COLLECTION_LOCATORS = {
+            By.xpath("(//a[contains(@href,'/collection/') and (contains(.,'район') or contains(.,'остров') or contains(.,'Лигов') or contains(.,'Сенной'))])[1]"),
+            By.xpath("(//a[contains(@href,'/collection/')])[1]")
     };
 
     static final By[] FROM_INPUT_LOCATORS = {
@@ -58,9 +88,10 @@ final class TwoGisLocators {
     };
 
     static final By[] WAYPOINT_INPUT_LOCATORS = {
-            By.xpath("//*[@id='root']/div/div/div[1]/div[1]/div[3]/div/div/div/div/div/div[1]/div/div[2]/div/div[1]/div/div[3]/div[1]/div/div[2]/div/input"),
             By.xpath("//input[contains(@placeholder,'Через') or contains(@aria-label,'Через')]"),
-            By.xpath("(//input[@type='text' and not(@disabled)])[3]")
+            By.xpath("(//input[not(@disabled)])[3]"),
+            By.xpath("(//input[not(@disabled)])[last()]"),
+            By.xpath("//*[@id='root']/div/div/div[1]/div[1]/div[3]/div/div/div/div/div/div[1]/div/div[2]/div/div[1]/div/div[3]/div[1]/div/div[2]/div/input")
     };
 
     static final By[] AUTOCOMPLETE_OPTION_LOCATORS = {
@@ -107,6 +138,26 @@ final class TwoGisLocators {
             By.xpath("//*[contains(.,'Скопировать ссылку') or contains(.,'Копировать ссылку')]")
     };
 
+    static final By[] WEATHER_BUTTON_LOCATORS = {
+            By.xpath("//*[@id='root']/div/div/div[2]/div[3]/div[1]/div/div/div[1]/div"),
+            By.xpath("//*[contains(@aria-label,'Погода') or contains(normalize-space(.),'Погода')]")
+    };
+
+    static final By[] WEATHER_PANEL_LOCATORS = {
+            By.xpath("//*[@id='root']/div/div/div[1]/div[1]/div[3]/div/div/div/div/div[1]/div[2]/div/div/div/div/div/div[2]"),
+            By.xpath("//*[contains(normalize-space(.),'°') or contains(normalize-space(.),'Осадки') or contains(normalize-space(.),'Ветер')]")
+    };
+
+    static final By[] ZOOM_IN_BUTTON_LOCATORS = {
+            By.xpath("//*[@id='root']/div/div/div[2]/div[3]/div[2]/div/div[1]/div/div[3]/div/button[1]"),
+            By.xpath("//button[contains(@aria-label,'Увеличить')]")
+    };
+
+    static final By[] ZOOM_OUT_BUTTON_LOCATORS = {
+            By.xpath("//*[@id='root']/div/div/div[2]/div[3]/div[2]/div/div[1]/div/div[3]/div/button[2]"),
+            By.xpath("//button[contains(@aria-label,'Уменьшить')]")
+    };
+
     static final By[] OVERLAY_CLOSE_LOCATORS = {
             By.xpath("//button[contains(@aria-label,'Закрыть')]"),
             By.xpath("//button[normalize-space()='Закрыть']"),
@@ -123,6 +174,18 @@ final class TwoGisLocators {
         }
 
         int inputIndex = waypointNumber + 2;
-        return new By[]{By.xpath("(//input[@type='text' and not(@disabled)])[" + inputIndex + "]")};
+        if (waypointNumber == 2) {
+            return new By[]{
+                    By.xpath("//*[@id='root']/div/div/div[1]/div[1]/div[3]/div/div/div/div/div/div[1]/div/div[2]/div/div[1]/div/div[4]/div[1]/div/div[2]/div/input"),
+                    By.xpath("(//input[contains(@placeholder,'Через') or contains(@aria-label,'Через')])[" + waypointNumber + "]"),
+                    By.xpath("(//input[not(@disabled)])[" + inputIndex + "]"),
+                    By.xpath("(//input[not(@disabled)])[last()]")
+            };
+        }
+        return new By[]{
+                By.xpath("(//input[contains(@placeholder,'Через') or contains(@aria-label,'Через')])[" + waypointNumber + "]"),
+                By.xpath("(//input[not(@disabled)])[" + inputIndex + "]"),
+                By.xpath("(//input[not(@disabled)])[last()]")
+        };
     }
 }

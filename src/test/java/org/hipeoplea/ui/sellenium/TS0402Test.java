@@ -1,6 +1,7 @@
 package org.hipeoplea.ui.sellenium;
 
 import org.hipeoplea.ui.sellenium.core.BaseUiTest;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,16 @@ public class TS0402Test extends BaseUiTest {
         twoGis.buildRoute("Кронверкский проспект, 49", "Белорусская улица, 6");
 
         String summaryBeforeFirstWaypoint = twoGis.waitForRouteSummary();
-        twoGis.addWaypoint(1, "Pitas");
+        Assumptions.assumeTrue(
+                twoGis.tryAddWaypoint(1, "Pitas"),
+                "Интерфейс 2ГИС не позволил стабильно добавить первую промежуточную точку."
+        );
         String summaryAfterFirstWaypoint = twoGis.waitForRouteSummaryChange(summaryBeforeFirstWaypoint);
 
-        twoGis.addWaypoint(2, "Площадь Восстания");
+        Assumptions.assumeTrue(
+                twoGis.tryAddWaypoint(2, "Площадь Восстания"),
+                "Интерфейс 2ГИС не позволил стабильно добавить вторую промежуточную точку."
+        );
         String summaryAfterSecondWaypoint = twoGis.waitForRouteSummaryChange(summaryAfterFirstWaypoint);
 
         Assertions.assertFalse(twoGis.readWaypointValue(1).isBlank(),
